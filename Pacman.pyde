@@ -6,6 +6,9 @@ from Player import Player
 SPRITE_SCALE = 50.0/128.0
 SPRITE_SIZE = 50.0
 MOVESPEED = 5
+RIGHT_MARGIN = 400;
+LEFT_MARGIN = 60;
+VERTICAL_MARGIN = 40;
 
 
 
@@ -13,12 +16,14 @@ def setup():
     size(800,600)
     imageMode(CENTER)
     playerImg = loadImage("player/player_stand_right.png")
-    global redBrick, brownBrick, crate, player, objects, gold, coins, score, enemies, enemyImage
+    global redBrick, brownBrick, crate, player, objects, gold, coins, score, enemies, enemyImage, viewX, viewY
     player = Player(playerImg, 55.0/96.0, 100, 100)
     objects = []
     coins = []
     enemies = []
     score = 0
+    viewX = 0
+    viewY = 0
     
     redBrick = loadImage("red_brick.png")
     brownBrick = loadImage("brown_brick.png")
@@ -32,6 +37,7 @@ def setup():
   
 def draw():
     background(0, 255, 0);
+    scroll()
     player.display()
     player.updateAnimation()
     resolveObjectCollisions(objects)
@@ -118,7 +124,6 @@ def checkCollisionList(spriteList):
 
 def resolveObjectCollisions(spriteList):
     player.centerX += player.changeX
-    
     collisionList = checkCollisionList(spriteList)
     if len(collisionList) > 0:
         collidedSprite = collisionList[0]
@@ -126,6 +131,7 @@ def resolveObjectCollisions(spriteList):
             player.setRight(collidedSprite.getLeft())
         elif player.changeX < 0:
             player.setLeft(collidedSprite.getRight())
+        
     player.centerY += player.changeY
     collisionList = checkCollisionList(spriteList)
     if len(collisionList) > 0:
@@ -134,8 +140,7 @@ def resolveObjectCollisions(spriteList):
             player.setBottom(collidedSprite.getTop())
         elif player.changeY < 0:
             player.setTop(collidedSprite.getBottom())
- 
-
+    
 def resolveCoinCollection():
     global score
     player.centerX += player.changeX
@@ -148,5 +153,25 @@ def resolveCoinCollection():
     player.centerY -= player.changeY
     
     
+def scroll():
+    global viewX, viewY
+    
+    rightBoundary = viewX + width - RIGHT_MARGIN
+    if player.getRight() > rightBoundary:
+        viewX += player.getRight() - rightBoundary
+        
+    leftBoundary = viewX + LEFT_MARGIN
+    if player.getLeft() < leftBoundary:
+        viewX -= leftBoundary - player.getLeft()
+    
+    bottomBoundary = viewY + height - VERTICAL_MARGIN
+    if player.getBottom() > bottomBoundary:
+        viewY += player.getBottom() - bottomBoundary
+        
+    topBoundary = viewY + VERTICAL_MARGIN
+    if player.getTop() < topBoundary:
+        viewY -= topBoundary - player.getTop()
+        
+    translate(-viewX, -viewY)
     
     
