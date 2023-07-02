@@ -1,6 +1,7 @@
 from Sprite import Sprite
 from Coin import Coin
 from Enemy import Enemy
+from Player import Player
 
 SPRITE_SCALE = 50.0/128.0
 SPRITE_SIZE = 50.0
@@ -13,7 +14,7 @@ def setup():
     imageMode(CENTER)
     playerImg = loadImage("player/player_stand_right.png")
     global redBrick, brownBrick, crate, player, objects, gold, coins, score, enemies, enemyImage
-    player = Sprite(playerImg, 55.0/96.0, 100, 100)
+    player = Player(playerImg, 55.0/96.0, 100, 100)
     objects = []
     coins = []
     enemies = []
@@ -32,9 +33,9 @@ def setup():
 def draw():
     background(0, 255, 0);
     player.display()
+    player.updateAnimation()
     resolveObjectCollisions(objects)
     resolveCoinCollection()
-    # print(player.hasCollidedWith(coins[0]))
     
     for obj in objects:
         obj.display()
