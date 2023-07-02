@@ -1,41 +1,53 @@
 from Sprite import Sprite
 from Coin import Coin
-from AnimatedSprite import AnimatedSprite
+from Enemy import Enemy
 
 SPRITE_SCALE = 50.0/128.0
 SPRITE_SIZE = 50.0
 MOVESPEED = 5
 
 
+
 def setup():
     size(800,600)
     imageMode(CENTER)
     playerImg = loadImage("player/player_stand_right.png")
-    global redBrick, brownBrick, crate, player, objects, gold, coins
+    global redBrick, brownBrick, crate, player, objects, gold, coins, score, enemies, enemyImage
     player = Sprite(playerImg, 55.0/96.0, 100, 100)
     objects = []
     coins = []
+    enemies = []
+    score = 0
     
     redBrick = loadImage("red_brick.png")
     brownBrick = loadImage("brown_brick.png")
     crate = loadImage("crate.png")
     gold = loadImage("coin/gold1.png")
+    enemyImage = loadImage("enemy/spider_walk_right1.png")
     
     createObjects("map.csv")
-    # coin = Coin(gold, SPRITE_SCALE, 100.0, 100.0)
+
   
   
 def draw():
     background(0, 255, 0);
     player.display()
     resolveObjectCollisions(objects)
+    resolveCoinCollection()
+    # print(player.hasCollidedWith(coins[0]))
+    
     for obj in objects:
         obj.display()
         
     for coin in coins:
         coin.display()
         coin.updateAnimation()
-
+        
+    for enemy in enemies:
+        enemy.display()
+        enemy.update()
+        enemy.updateAnimation()
+    
 
 def keyPressed():
     if(keyCode == RIGHT):
@@ -84,6 +96,15 @@ def createObjects(filename):
                 coin.centerX = SPRITE_SIZE/2 + col * SPRITE_SIZE
                 coin.centerY = SPRITE_SIZE/2 + row * SPRITE_SIZE
                 coins.append(coin)
+            if values[col] == "5":
+                bLeft = col * SPRITE_SIZE
+                bRight = bLeft + 4*SPRITE_SIZE 
+                enemy = Enemy(enemyImage, 60.0/72.0, bLeft, bRight)
+                enemy.centerX = SPRITE_SIZE/2 + col * SPRITE_SIZE
+                enemy.centerY = SPRITE_SIZE/2 + row * SPRITE_SIZE
+                enemies.append(enemy)
+            
+    
                 
                 
                 
@@ -104,8 +125,6 @@ def resolveObjectCollisions(spriteList):
             player.setRight(collidedSprite.getLeft())
         elif player.changeX < 0:
             player.setLeft(collidedSprite.getRight())
-    
-        
     player.centerY += player.changeY
     collisionList = checkCollisionList(spriteList)
     if len(collisionList) > 0:
@@ -114,6 +133,18 @@ def resolveObjectCollisions(spriteList):
             player.setBottom(collidedSprite.getTop())
         elif player.changeY < 0:
             player.setTop(collidedSprite.getBottom())
+ 
+
+def resolveCoinCollection():
+    global score
+    player.centerX += player.changeX
+    player.centerY += player.changeY
+    collisionList = checkCollisionList(coins)
+    for coin in collisionList:
+        score += 1
+        coins.remove(coin)
+    player.centerX -= player.changeX
+    player.centerY -= player.changeY
     
     
     
