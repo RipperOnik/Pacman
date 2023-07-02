@@ -7,7 +7,7 @@ SPRITE_SCALE = 50.0/128.0
 SPRITE_SIZE = 50.0
 MOVESPEED = 5
 RIGHT_MARGIN = 400;
-LEFT_MARGIN = 60;
+LEFT_MARGIN = 100;
 VERTICAL_MARGIN = 40;
 
 
@@ -16,14 +16,16 @@ def setup():
     size(800,600)
     imageMode(CENTER)
     playerImg = loadImage("player/player_stand_right.png")
-    global redBrick, brownBrick, crate, player, objects, gold, coins, score, enemies, enemyImage, viewX, viewY
-    player = Player(playerImg, 55.0/96.0, 100, 100)
+    global redBrick, brownBrick, crate, player, objects, gold, coins, score, enemies, enemyImage, viewX, viewY, won, lost
+    player = Player(playerImg, 50.0/96.0, 100, 100)
     objects = []
     coins = []
     enemies = []
     score = 0
     viewX = 0
     viewY = 0
+    won = False
+    lost = False
     
     redBrick = loadImage("red_brick.png")
     brownBrick = loadImage("brown_brick.png")
@@ -36,25 +38,31 @@ def setup():
   
   
 def draw():
-    background(0, 255, 0);
-    scroll()
-    player.display()
-    player.updateAnimation()
-    resolveObjectCollisions(objects)
-    resolveCoinCollection()
-    
-    for obj in objects:
-        obj.display()
+    if lost or won:
+        displayGameOver()
+    else:
+        background(0, 255, 0);
+        scroll()
+        player.display()
+        player.updateAnimation()
+        resolveObjectCollisions(objects)
+        resolveCoinCollection()
+        checkDeath()
         
-    for coin in coins:
-        coin.display()
-        coin.updateAnimation()
         
-    for enemy in enemies:
-        enemy.display()
-        enemy.update()
-        enemy.updateAnimation()
-    
+        for obj in objects:
+            obj.display()
+            
+        for coin in coins:
+            coin.display()
+            coin.updateAnimation()
+            
+        for enemy in enemies:
+            enemy.display()
+            enemy.update()
+            enemy.updateAnimation()
+        
+        displayScore()
 
 def keyPressed():
     if(keyCode == RIGHT):
@@ -106,7 +114,7 @@ def createObjects(filename):
             if values[col] == "5":
                 bLeft = col * SPRITE_SIZE
                 bRight = bLeft + 4*SPRITE_SIZE 
-                enemy = Enemy(enemyImage, 60.0/72.0, bLeft, bRight)
+                enemy = Enemy(enemyImage, 45.0/72.0, bLeft, bRight)
                 enemy.centerX = SPRITE_SIZE/2 + col * SPRITE_SIZE
                 enemy.centerY = SPRITE_SIZE/2 + row * SPRITE_SIZE
                 enemies.append(enemy)
@@ -142,7 +150,7 @@ def resolveObjectCollisions(spriteList):
             player.setTop(collidedSprite.getBottom())
     
 def resolveCoinCollection():
-    global score
+    global score, won
     player.centerX += player.changeX
     player.centerY += player.changeY
     collisionList = checkCollisionList(coins)
@@ -151,6 +159,8 @@ def resolveCoinCollection():
         coins.remove(coin)
     player.centerX -= player.changeX
     player.centerY -= player.changeY
+    if len(coins) == 0:
+        won = True
     
     
 def scroll():
@@ -174,4 +184,33 @@ def scroll():
         
     translate(-viewX, -viewY)
     
+def checkDeath():
+    global lost
+    player.centerX += player.changeX
+    player.centerY += player.changeY
     
+    collisionList = checkCollisionList(enemies)
+    if len(collisionList) > 0:
+        lost = True
+        
+    player.centerX -= player.changeX
+    player.centerY -= player.changeY 
+
+def displayScore():
+    textSize(32)
+    fill(0,0,255)
+    text("Coins: {}".format(score), viewX + 50, viewY + 50)
+def displayGameOver():
+    fill(0,0,255)
+    scroll()
+    textX = viewX + width/2 - 100
+    textY = viewY + height/2
+    text("GAME OVER", textX, textY)
+    
+    if lost:
+        text("YOU LOSE", textX, textY + 50)
+    elif won:
+        text("YOU WIN", textX, textY + 50)
+    text("PRESS SPACE TO RESTART", textX, textY + 100)
+    if keyCode == 32:
+        setup()
