@@ -1,9 +1,9 @@
 from Sprite import Sprite
 
 class AnimatedSprite(Sprite):
-    NEUTRAL_FACING = 0;
-    RIGHT_FACING = 1;
-    LEFT_FACING = 2;
+    NEUTRAL_FACING = 0
+    RIGHT_FACING = 1
+    LEFT_FACING = 2
     def __init__(self, img, scaling, x = 0, y = 0, dx = 0, dy = 0):
         Sprite.__init__(self, img, scaling, x, y, dx, dy)
         self.direction = self.NEUTRAL_FACING

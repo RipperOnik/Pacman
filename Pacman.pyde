@@ -6,9 +6,9 @@ from Player import Player
 SPRITE_SCALE = 50.0/128.0
 SPRITE_SIZE = 50.0
 MOVESPEED = 5
-RIGHT_MARGIN = 400;
-LEFT_MARGIN = 100;
-VERTICAL_MARGIN = 40;
+RIGHT_MARGIN = 400
+LEFT_MARGIN = 100
+VERTICAL_MARGIN = 40
 
 
 
@@ -41,14 +41,13 @@ def draw():
     if lost or won:
         displayGameOver()
     else:
-        background(0, 255, 0);
+        background(0, 255, 0)
         scroll()
         player.display()
         player.updateAnimation()
         resolveObjectCollisions(objects)
         resolveCoinCollection()
         checkDeath()
-        
         
         for obj in objects:
             obj.display()

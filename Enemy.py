@@ -18,8 +18,6 @@ class Enemy(AnimatedSprite):
         
     def update(self):
         AnimatedSprite.update(self)
-        # self.centerX += self.changeX
-        # self.centerY += self.changeY
         if self.getLeft() <= self.bLeft:
             self.setLeft(self.bLeft)
             self.changeX *= -1
